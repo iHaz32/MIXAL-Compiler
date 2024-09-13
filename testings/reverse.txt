@@ -1,0 +1,8 @@
+n := 123;
+reversed := 0;
+repeat
+    digit := n - (n / 10) * 10;
+    reversed := reversed * 10 + digit;
+    n := n / 10
+until n = 0;
+write reversed
