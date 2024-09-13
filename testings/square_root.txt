@@ -1,0 +1,8 @@
+x := 12;
+result := 0;
+counter := x;
+repeat
+    result := result + x;
+    counter := counter - 1
+until counter = 0;
+write result
