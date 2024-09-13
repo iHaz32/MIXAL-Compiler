@@ -1,0 +1,12 @@
+n := 13;
+isPrime := 1;
+div := 2;
+
+repeat
+    if div * (n / div) = n then
+        isPrime := 0
+    end;
+    div := div + 1
+until div = n;
+
+write isPrime
