@@ -175,8 +175,8 @@ void expand_node(TreeNode *node) {
                 symbol = create_symbol(node->left->value);  // create new symbol if not found
                 add_symbol(symbol, &symbolList);  // add it to the symbol list
             }
-            fprintf(logFile, "(%s -> %d)\n", symbol->name, symbol->value);  // log symbol and its value
             symbol->value = decide_expression(node->right, symbolList);  // update symbol value
+            fprintf(logFile, "(%s -> %d)\n", symbol->name, symbol->value);  // log symbol and its value
             break;
         }
         case NODE_IF: {  // handle if node
