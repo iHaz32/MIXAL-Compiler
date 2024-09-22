@@ -245,14 +245,6 @@ void generate_mix_code(TreeNode *node) {
                 fprintf(mixFile, "ENDIF%d\n", currentLabel);
             }
             break;
-        case NODE_ELSE:
-            if (DEBUG) printf("NODE_ELSE\n");  // For debugging
-            fprintf(mixFile, "BR L%d\n", label_count);  // Branch to skip the else part
-            fprintf(mixFile, "L%d:\n", label_count - 1); // Label for the else part
-            generate_mix_code(node->left);  // Generate code for the false branch
-            fprintf(mixFile, "L%d:\n", label_count);  // Label for the end of else part
-            label_count++;  // Increment label count for the next section
-            break;
         case NODE_REPEAT:
             if (DEBUG) printf("NODE_REPEAT\n");  // For debugging
             fprintf(mixFile, "L%d:\n", label_count++);  // Label for the start of the loop
