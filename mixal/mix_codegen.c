@@ -191,11 +191,55 @@ void generate_mix_code(TreeNode *node) {
             break;
         case NODE_IF:
             if (DEBUG) printf("NODE_IF\n");  // For debugging
-            generate_expression(node->left);  // Evaluate the condition
-            fprintf(mixFile, "BRZ L%d\n", label_count);  // Branch to Lx if condition is false
-            generate_mix_code(node->right);   // Generate code for the true branch
-            fprintf(mixFile, "L%d:\n", label_count); // Label for the end of true branch
-            label_count++;  // Increment label count for the next section
+            int currentLabel = label_count++;
+    
+            if ((node->type == NODE_IF) && (node->right->type != NODE_ELSE)) {
+                // Generate code for the condition
+                generate_mix_code(node->left);
+
+                // Handle comparisons (expand as needed)
+                if (node->left->type == NODE_LT) {
+                    fprintf(mixFile, " JL THEN%d\n", currentLabel);
+                } else if (node->left->type == NODE_EQ) {
+                    fprintf(mixFile, " JE THEN%d\n", currentLabel);
+                }
+                
+                // Unconditional jump to ENDIF
+                fprintf(mixFile," JMP ENDIF%d\n", currentLabel);
+                
+                // THEN block
+                fprintf(mixFile, "THEN%d\n", currentLabel);
+                generate_mix_code(node->right); // Generate code for the 'then' part
+                
+                // End of if
+                fprintf(mixFile, "ENDIF%d\n", currentLabel);
+
+            } else if ((node->type == NODE_IF) && (node->right->type == NODE_ELSE)) {
+                // Generate code for the condition
+                generate_mix_code(node->left);
+
+                // Handle comparisons
+                if (node->left->type == NODE_LT) {
+                    fprintf(mixFile, " JL THEN%d\n", currentLabel);
+                } else if (node->left->type == NODE_EQ) {
+                    fprintf(mixFile, " JE THEN%d\n", currentLabel);
+                }
+                
+                // Unconditional jump to ELSE
+                fprintf(mixFile, " JMP ELSE%d\n", currentLabel);
+                
+                // THEN block
+                fprintf(mixFile, "THEN%d\n", currentLabel);
+                generate_mix_code(node->right->left); // Generate code for the 'then' part
+                fprintf(mixFile, " JMP ENDIF%d\n", currentLabel); // Jump to the end of if-else
+                
+                // ELSE block
+                fprintf(mixFile, "ELSE%d\n", currentLabel);
+                generate_mix_code(node->right->right); // Generate code for the 'else' part
+                
+                // End of if-else
+                fprintf(mixFile, "ENDIF%d\n", currentLabel);
+            }
             break;
         case NODE_ELSE:
             if (DEBUG) printf("NODE_ELSE\n");  // For debugging
