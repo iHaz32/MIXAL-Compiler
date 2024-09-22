@@ -171,6 +171,8 @@ void expand_node(TreeNode *node) {
         }
         case NODE_ASSIGNMENT: {  // handle assignment node
             symbol *symbol = find_symbol(node->left->value, symbolList);
+            printf("HEREEE\n");
+            printf("value: %s\n", node->left->value);
             if (symbol == NULL) {
                 symbol = create_symbol(node->left->value);  // create new symbol if not found
                 add_symbol(symbol, &symbolList);  // add it to the symbol list
@@ -192,6 +194,14 @@ void expand_node(TreeNode *node) {
             do {
                 expand_node(node->left);  // expand the loop body
             } while (!decide_expression(node->right, symbolList));  // repeat until condition becomes true
+            break;
+        }
+        case NODE_READ: {  // handle read node
+            symbol *symbol = find_symbol(node->value, symbolList);
+            if (symbol == NULL) {
+                symbol = create_symbol(node->value);  // create new symbol if not found
+                add_symbol(symbol, &symbolList);  // add it to the symbol list
+            }
             break;
         }
         case NODE_WRITE: {  // handle write node
