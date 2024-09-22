@@ -143,7 +143,7 @@ static void generate_expression(TreeNode *node) {
             if (is_numeric(node->right->value)) {
                 fprintf(mixFile, " CMPA =%d\n", node->right->value);
             } else {
-                symbol *sym = findSymbol(node->right->value, symbolList);
+                symbol *sym = find_symbol(node->right->value, symbolList);
                 if (sym != NULL) {
                     fprintf(mixFile, " CMPA %d\n", sym->memoryLocation);
                 } else {
@@ -159,7 +159,7 @@ static void generate_expression(TreeNode *node) {
             if (is_numeric(node->right->value)) {
                 fprintf(mixFile, " CMPA =%d\n", node->right->value);
             } else {
-                symbol *sym = findSymbol(node->right->value, symbolList);
+                symbol *sym = find_symbol(node->right->value, symbolList);
                 if (sym != NULL) {
                     fprintf(mixFile, " CMPA %d\n", sym->memoryLocation);
                 } else {
