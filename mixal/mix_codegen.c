@@ -265,9 +265,28 @@ void generate_mix_code(TreeNode *node) {
             break;
         case NODE_READ:
             if (DEBUG) printf("NODE_READ\n");  // For debugging
-            fprintf(mixFile, "INP\n");  // Input value from user
-            fprintf(mixFile, "STA %d\n", find_memory_location(node->value));  // Store the input into the variable using memory address
-            break;
+            symbol *sym = findSymbol(node->value, symbolList);
+            if (sym != NULL) {
+                int input_buffer_address = 1000;  // Address for input
+                int input_device = 19;             // Device number for input
+
+                // Read input into the buffer
+                fprintf(mixFile, " IN %d(%d)\n", input_buffer_address, input_device);
+
+                // Check for input errors
+                fprintf(mixFile, " JBUS *(%d)\n", input_device);
+
+                // Load the input buffer into the accumulator
+                fprintf(mixFile, " LDX %d(0:5)\n", input_buffer_address); // Load the input value
+
+                // Convert to numeric format if necessary
+                fprintf(mixFile, " NUM\n");
+
+                // Store the converted value in the variable's memory location
+                fprintf(mixFile, " STA %d(0:5)\n", sym->memoryLocation);
+            } else {
+                fprintf(mixFile, "ERROR: Variable %s not found in symbol list.\n", node->value);
+            }
         case NODE_WRITE:
             if (DEBUG) printf("NODE_WRITE\n");  // For debugging
             fprintf(mixFile, " OUT %d\n", find_memory_location(node->value));  // Output value
