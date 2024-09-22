@@ -13,7 +13,7 @@ static int temp_count = 1;  // counter for generating unique temporary variables
 extern symbol *symbolList;  // external symbol list pointer
 
 void createMixFile() {
-    mixFile = fopen("mix.txt", "w");  // open log file for writing
+    mixFile = fopen("mix.mixal", "w");  // open log file for writing
     if (mixFile == NULL) {
         fprintf(stderr, "ERROR: Can not open mixal file.\n");  // print error message if file cannot be opened
     }
