@@ -212,11 +212,11 @@ void generate_mix_code(TreeNode *node) {
                 fprintf(mixFile," JMP ENDIF%d\n", currentLabel);
                 
                 // THEN block
-                fprintf(mixFile, "THEN%d\n", currentLabel);
+                fprintf(mixFile, "THEN%d NOP\n", currentLabel);
                 generate_mix_code(node->right); // Generate code for the 'then' part
                 
                 // End of if
-                fprintf(mixFile, "ENDIF%d\n", currentLabel);
+                fprintf(mixFile, "ENDIF%d NOP\n", currentLabel);
 
             } else if ((node->type == NODE_IF) && (node->right->type == NODE_ELSE)) {
                 // Generate code for the condition
@@ -233,16 +233,16 @@ void generate_mix_code(TreeNode *node) {
                 fprintf(mixFile, " JMP ELSE%d\n", currentLabel);
                 
                 // THEN block
-                fprintf(mixFile, "THEN%d\n", currentLabel);
+                fprintf(mixFile, "THEN%d NOP\n", currentLabel);
                 generate_mix_code(node->right->left); // Generate code for the 'then' part
                 fprintf(mixFile, " JMP ENDIF%d\n", currentLabel); // Jump to the end of if-else
                 
                 // ELSE block
-                fprintf(mixFile, "ELSE%d\n", currentLabel);
+                fprintf(mixFile, "ELSE%d NOP\n", currentLabel);
                 generate_mix_code(node->right->right); // Generate code for the 'else' part
                 
                 // End of if-else
-                fprintf(mixFile, "ENDIF%d\n", currentLabel);
+                fprintf(mixFile, "ENDIF%d NOP\n", currentLabel);
             }
             break;
         case NODE_REPEAT:
