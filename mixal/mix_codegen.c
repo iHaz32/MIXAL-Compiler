@@ -139,30 +139,34 @@ static void generate_expression(TreeNode *node) {
         case NODE_LT:
             if (DEBUG) printf("NODE_LT\n");  // For debugging
             generate_expression(node->left);   // Evaluate left operand
-            fprintf(mixFile, "STA TEMP\n");              // Store result temporarily
-            generate_expression(node->right);  // Evaluate right operand
-            fprintf(mixFile, "LDA TEMP\n");              // Load result from TEMP
-            fprintf(mixFile, "CMPA %d\n", find_memory_location(node->right->value));  // Compare with right operand value
-            fprintf(mixFile, "BRN L%d\n", label_count);  // Branch to Lx if less than (negative result)
-            fprintf(mixFile, "LDA #0\n");                // Load 0 into accumulator (false)
-            fprintf(mixFile, "BR L%d\n", label_count + 1);  // Branch to Lx+1
-            fprintf(mixFile, "L%d: LDA #1\n", label_count);  // Load 1 into accumulator (true)
-            fprintf(mixFile, "L%d:\n", label_count + 1);  // Label Lx+1
-            label_count += 2;
+
+            if (is_numeric(node->right->value)) {
+                fprintf(mixFile, " CMPA =%d\n", node->right->value);
+            } else {
+                symbol *sym = findSymbol(node->right->value, symbolList);
+                if (sym != NULL) {
+                    fprintf(mixFile, " CMPA %d\n", sym->memoryLocation);
+                } else {
+                    fprintf(stderr, "ERROR: Symbol %s was not found in symbol list.\n", node->right->value);
+                }
+            }
+            
             break;
         case NODE_EQ:
             if (DEBUG) printf("NODE_EQ\n");  // For debugging
             generate_expression(node->left);   // Evaluate left operand
-            fprintf(mixFile, "STA TEMP\n");              // Store result temporarily
-            generate_expression(node->right);  // Evaluate right operand
-            fprintf(mixFile, "LDA TEMP\n");              // Load result from TEMP
-            fprintf(mixFile, "CMPA %d\n", find_memory_location(node->right->value));  // Compare with right operand value
-            fprintf(mixFile, "BRZ L%d\n", label_count);  // Branch to Lx if zero (equal)
-            fprintf(mixFile, "LDA #0\n");                // Load 0 into accumulator (false)
-            fprintf(mixFile, "BR L%d\n", label_count + 1);  // Branch to Lx+1
-            fprintf(mixFile, "L%d: LDA #1\n", label_count);  // Load 1 into accumulator (true)
-            fprintf(mixFile, "L%d:\n", label_count + 1);  // Label Lx+1
-            label_count += 2;
+
+            if (is_numeric(node->right->value)) {
+                fprintf(mixFile, " CMPA =%d\n", node->right->value);
+            } else {
+                symbol *sym = findSymbol(node->right->value, symbolList);
+                if (sym != NULL) {
+                    fprintf(mixFile, " CMPA %d\n", sym->memoryLocation);
+                } else {
+                    fprintf(stderr, "ERROR: Symbol %s was not found in symbol list.\n", node->right->value);
+                }
+            }
+            
             break;
         default:
             if (DEBUG) printf("(default in expression)\n");  // For debugging
