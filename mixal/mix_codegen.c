@@ -6,7 +6,8 @@
 #define DEBUG 0
 
 FILE *mixFile;                // file pointer for mixal code
-static int label_count = 0;  // Counter for generating unique labels
+static int if_label_count = 0;  // Counter for generating unique if-statement labels
+static int repeat_label_count = 0;  // Counter for generating unique repeat-statement labels
 static int temp_count = 1;  // Counter for generating unique temporary variables
 extern symbol *symbolList;  // External symbol list pointer
 
@@ -16,13 +17,6 @@ void createMixFile() {
     if (mixFile == NULL) {
         fprintf(stderr, "ERROR: Can not open mixal file.\n");  // print error message if file cannot be opened
     }
-}
-
-// Helper function to generate a new label
-static char* new_label() {
-    static char label[20];
-    snprintf(label, sizeof(label), "L%d", label_count++);
-    return label;
 }
 
 int is_numeric(const char *str) {
@@ -141,7 +135,8 @@ static void generate_expression(TreeNode *node) {
             generate_expression(node->left);   // Evaluate left operand
 
             if (is_numeric(node->right->value)) {
-                fprintf(mixFile, " CMPA =%d\n", node->right->value);
+                fprintf(mixFile, " ENTX %s\n", node->right->value);
+                fprintf(mixFile, " CMPA S\n");
             } else {
                 symbol *sym = find_symbol(node->right->value, symbolList);
                 if (sym != NULL) {
@@ -157,7 +152,8 @@ static void generate_expression(TreeNode *node) {
             generate_expression(node->left);   // Evaluate left operand
 
             if (is_numeric(node->right->value)) {
-                fprintf(mixFile, " CMPA =%d\n", node->right->value);
+                fprintf(mixFile, " ENTX %s\n", node->right->value);
+                fprintf(mixFile, " CMPA S\n");
             } else {
                 symbol *sym = find_symbol(node->right->value, symbolList);
                 if (sym != NULL) {
@@ -195,7 +191,7 @@ void generate_mix_code(TreeNode *node) {
             break;
         case NODE_IF:
             if (DEBUG) printf("NODE_IF\n");  // For debugging
-            int currentLabel = label_count++;
+            int currentIfLabel = if_label_count++;
     
             if ((node->type == NODE_IF) && (node->right->type != NODE_ELSE)) {
                 // Generate code for the condition
@@ -203,20 +199,20 @@ void generate_mix_code(TreeNode *node) {
 
                 // Handle comparisons (expand as needed)
                 if (node->left->type == NODE_LT) {
-                    fprintf(mixFile, " JL THEN%d\n", currentLabel);
+                    fprintf(mixFile, " JL THEN%d\n", currentIfLabel);
                 } else if (node->left->type == NODE_EQ) {
-                    fprintf(mixFile, " JE THEN%d\n", currentLabel);
+                    fprintf(mixFile, " JE THEN%d\n", currentIfLabel);
                 }
                 
                 // Unconditional jump to ENDIF
-                fprintf(mixFile," JMP ENDIF%d\n", currentLabel);
+                fprintf(mixFile," JMP ENDIF%d\n", currentIfLabel);
                 
                 // THEN block
-                fprintf(mixFile, "THEN%d NOP\n", currentLabel);
+                fprintf(mixFile, "THEN%d NOP\n", currentIfLabel);
                 generate_mix_code(node->right); // Generate code for the 'then' part
                 
                 // End of if
-                fprintf(mixFile, "ENDIF%d NOP\n", currentLabel);
+                fprintf(mixFile, "ENDIF%d NOP\n", currentIfLabel);
 
             } else if ((node->type == NODE_IF) && (node->right->type == NODE_ELSE)) {
                 // Generate code for the condition
@@ -224,33 +220,48 @@ void generate_mix_code(TreeNode *node) {
 
                 // Handle comparisons
                 if (node->left->type == NODE_LT) {
-                    fprintf(mixFile, " JL THEN%d\n", currentLabel);
+                    fprintf(mixFile, " JL THEN%d\n", currentIfLabel);
                 } else if (node->left->type == NODE_EQ) {
-                    fprintf(mixFile, " JE THEN%d\n", currentLabel);
+                    fprintf(mixFile, " JE THEN%d\n", currentIfLabel);
                 }
                 
                 // Unconditional jump to ELSE
-                fprintf(mixFile, " JMP ELSE%d\n", currentLabel);
+                fprintf(mixFile, " JMP ELSE%d\n", currentIfLabel);
                 
                 // THEN block
-                fprintf(mixFile, "THEN%d NOP\n", currentLabel);
+                fprintf(mixFile, "THEN%d NOP\n", currentIfLabel);
                 generate_mix_code(node->right->left); // Generate code for the 'then' part
-                fprintf(mixFile, " JMP ENDIF%d\n", currentLabel); // Jump to the end of if-else
+                fprintf(mixFile, " JMP ENDIF%d\n", currentIfLabel); // Jump to the end of if-else
                 
                 // ELSE block
-                fprintf(mixFile, "ELSE%d NOP\n", currentLabel);
+                fprintf(mixFile, "ELSE%d NOP\n", currentIfLabel);
                 generate_mix_code(node->right->right); // Generate code for the 'else' part
                 
                 // End of if-else
-                fprintf(mixFile, "ENDIF%d NOP\n", currentLabel);
+                fprintf(mixFile, "ENDIF%d NOP\n", currentIfLabel);
             }
             break;
         case NODE_REPEAT:
             if (DEBUG) printf("NODE_REPEAT\n");  // For debugging
-            fprintf(mixFile, "L%d:\n", label_count++);  // Label for the start of the loop
-            generate_mix_code(node->left);   // Generate code for the loop body
-            generate_expression(node->right);  // Evaluate the condition
-            fprintf(mixFile, "BRZ L%d\n", label_count - 1);  // Branch to end if condition is true
+            int currentRepeatLabel = repeat_label_count++;
+
+            // Start of the repeat loop
+            fprintf(mixFile, "REPEAT%d NOP\n", currentRepeatLabel);
+            generate_mix_code(node->left);  // Generate code for the body of the repeat loop
+
+            generate_expression(node->right);
+            // Handle comparisons
+            if (node->right->type == NODE_LT) {
+                fprintf(mixFile, " JL ENDREPEAT%d\n", currentRepeatLabel);
+            } else if (node->right->type == NODE_EQ) {
+                fprintf(mixFile, " JE ENDREPEAT%d\n", currentRepeatLabel);
+            }
+
+            // Jump back to the start of the loop
+            fprintf(mixFile, " JMP REPEAT%d\n", currentRepeatLabel);
+
+            // End of the repeat loop
+            fprintf(mixFile, "ENDREPEAT%d NOP\n", currentRepeatLabel);
             break;
         case NODE_READ:
             if (DEBUG) printf("NODE_READ\n");  // For debugging
@@ -259,7 +270,7 @@ void generate_mix_code(TreeNode *node) {
             break;
         case NODE_WRITE:
             if (DEBUG) printf("NODE_WRITE\n");  // For debugging
-            fprintf(mixFile, "OUT %d\n", find_memory_location(node->value));  // Output value
+            fprintf(mixFile, " OUT %d\n", find_memory_location(node->value));  // Output value
             break;
         case NODE_SEQ:
             if (DEBUG) printf("NODE_SEQ\n");  // For debugging
