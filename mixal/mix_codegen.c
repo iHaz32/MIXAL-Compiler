@@ -199,7 +199,7 @@ void generate_mix_code(TreeNode *node) {
     
             if ((node->type == NODE_IF) && (node->right->type != NODE_ELSE)) {
                 // Generate code for the condition
-                generate_mix_code(node->left);
+                generate_expression(node->left);
 
                 // Handle comparisons (expand as needed)
                 if (node->left->type == NODE_LT) {
@@ -220,7 +220,7 @@ void generate_mix_code(TreeNode *node) {
 
             } else if ((node->type == NODE_IF) && (node->right->type == NODE_ELSE)) {
                 // Generate code for the condition
-                generate_mix_code(node->left);
+                generate_expression(node->left);
 
                 // Handle comparisons
                 if (node->left->type == NODE_LT) {
