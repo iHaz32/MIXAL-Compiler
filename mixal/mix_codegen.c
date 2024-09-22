@@ -14,7 +14,7 @@ extern symbol *symbolList;  // External symbol list pointer
 void createMixFile() {
     mixFile = fopen("mix.txt", "w");  // open log file for writing
     if (mixFile == NULL) {
-        fprintf(stderr, "Error opening mix file!\n");  // print error message if file cannot be opened
+        fprintf(stderr, "ERROR: Can not open mixal file.\n");  // print error message if file cannot be opened
     }
 }
 
@@ -61,11 +61,11 @@ static void generate_expression(TreeNode *node) {
     switch (node->type) {
         case NODE_NUMBER:
             if (DEBUG) printf("NODE_NUMBER\n");  // For debugging
-            fprintf(mixFile, "ENTA %s\n", node->value);  // Load the number into the accumulator
+            fprintf(mixFile, " ENTA %s\n", node->value);  // Load the number into the accumulator
             break;
         case NODE_ID:
             if (DEBUG) printf("NODE_ID\n");  // For debugging
-            fprintf(mixFile, "LDA %d\n", find_memory_location(node->value));  // Load the variable value into the accumulator using its memory address
+            fprintf(mixFile, " LDA %d\n", find_memory_location(node->value));  // Load the variable value into the accumulator using its memory address
             break;
        case NODE_ADD:
             if (DEBUG) printf("NODE_ADD\n");  // For debugging
@@ -73,12 +73,12 @@ static void generate_expression(TreeNode *node) {
             // Generate code for left operand
             generate_expression(node->left);
             // Store result temporarily
-            fprintf(mixFile, "STA TEMP%d\n", addTemp);
+            fprintf(mixFile, " STA TEMP%d\n", addTemp);
             temp_count++;
             // Generate code for right operand
             generate_expression(node->right);
             // Load temporary result and add
-            fprintf(mixFile, "ADD TEMP%d\n", addTemp);  // Load previous temp
+            fprintf(mixFile, " ADD TEMP%d\n", addTemp);  // Load previous temp
             break;
         case NODE_SUBTRACT:
             if (DEBUG) printf("NODE_SUBTRACT\n");  // For debugging
@@ -86,17 +86,17 @@ static void generate_expression(TreeNode *node) {
             // Generate code for left operand
             generate_expression(node->left);
             // Store result temporarily
-            fprintf(mixFile, "STA TEMP%d\n", subTemp);
+            fprintf(mixFile, " STA TEMP%d\n", subTemp);
             temp_count++;
             // Generate code for right operand
             generate_expression(node->right);
             // Load temporary result and subtract
-            fprintf(mixFile, "SUB TEMP%d\n", subTemp);  // Load previous temp
+            fprintf(mixFile, " SUB TEMP%d\n", subTemp);  // Load previous temp
 
             // A = 0-A
-            fprintf(mixFile, "STA OPPTEMP\n");
-            fprintf(mixFile, "ENTA 0\n");
-            fprintf(mixFile, "SUB OPPTEMP\n");
+            fprintf(mixFile, " STA OPPTEMP\n");
+            fprintf(mixFile, " ENTA 0\n");
+            fprintf(mixFile, " SUB OPPTEMP\n");
             break;
         case NODE_MULTIPLY:
             if (DEBUG) printf("NODE_MULTIPLY\n");  // For debugging
@@ -104,15 +104,15 @@ static void generate_expression(TreeNode *node) {
             // Generate code for left operand
             generate_expression(node->left);
             // Store result temporarily
-            fprintf(mixFile, "STA TEMP%d\n", mulTemp);
+            fprintf(mixFile, " STA TEMP%d\n", mulTemp);
             temp_count++;
             // Generate code for right operand
             generate_expression(node->right);
             // Load temporary result and multiply
-            fprintf(mixFile, "MUL TEMP%d\n", mulTemp);  // Load previous temp
-            fprintf(mixFile, "STX TEMP%d\n", mulTemp);
-            fprintf(mixFile, "LDA TEMP%d\n", mulTemp);
-            fprintf(mixFile, "ENTX 0\n");
+            fprintf(mixFile, " MUL TEMP%d\n", mulTemp);  // Load previous temp
+            fprintf(mixFile, " STX TEMP%d\n", mulTemp);
+            fprintf(mixFile, " LDA TEMP%d\n", mulTemp);
+            fprintf(mixFile, " ENTX 0\n");
             break;
         case NODE_DIVIDE:
             if (DEBUG) printf("NODE_DIVIDE\n");  // For debugging
@@ -120,20 +120,20 @@ static void generate_expression(TreeNode *node) {
             // Generate code for left operand
             generate_expression(node->left);
             // Store result temporarily
-            fprintf(mixFile, "STA TEMP%d\n", divTemp);
+            fprintf(mixFile, " STA TEMP%d\n", divTemp);
             temp_count++;
             // Generate code for right operand
             generate_expression(node->right);
             
             // A = 1/A (Swap A and TEMP)
-            fprintf(mixFile, "STA SWAPTEMP\n");  // swaptemp = A
-            fprintf(mixFile, "LDX SWAPTEMP\n");  // X = swaptemp => X = A
-            fprintf(mixFile, "LDA TEMP%d\n", divTemp);  // A = temp
-            fprintf(mixFile, "STX TEMP%d\n", divTemp);  // temp = X
-            fprintf(mixFile, "STA SWAPTEMP\n");
-            fprintf(mixFile, "LDX SWAPTEMP\n");
-            fprintf(mixFile, "ENTA 0\n");
-            fprintf(mixFile, "DIV TEMP%d\n", divTemp);
+            fprintf(mixFile, " STA SWAPTEMP\n");  // swaptemp = A
+            fprintf(mixFile, " LDX SWAPTEMP\n");  // X = swaptemp => X = A
+            fprintf(mixFile, " LDA TEMP%d\n", divTemp);  // A = temp
+            fprintf(mixFile, " STX TEMP%d\n", divTemp);  // temp = X
+            fprintf(mixFile, " STA SWAPTEMP\n");
+            fprintf(mixFile, " LDX SWAPTEMP\n");
+            fprintf(mixFile, " ENTA 0\n");
+            fprintf(mixFile, " DIV TEMP%d\n", divTemp);
 
             break;
         case NODE_LT:
@@ -166,7 +166,7 @@ static void generate_expression(TreeNode *node) {
                     fprintf(stderr, "ERROR: Symbol %s was not found in symbol list.\n", node->right->value);
                 }
             }
-            
+
             break;
         default:
             if (DEBUG) printf("(default in expression)\n");  // For debugging
@@ -183,15 +183,15 @@ void generate_mix_code(TreeNode *node) {
     switch (node->type) {
         case NODE_PROGRAM:
             createMixFile();
-            fprintf(mixFile, "ORIG 2000\n");  // First mixal command
+            fprintf(mixFile, " ORIG 2000\n");  // First mixal command
             generate_mix_code(node->left);  // Generate code for the program body
-            fprintf(mixFile, "END 2000\n");   // Last mixal command
+            fprintf(mixFile, " END 2000\n");   // Last mixal command
             fclose(mixFile);
             break;
         case NODE_ASSIGNMENT:
             if (DEBUG) printf("NODE_ASSIGNMENT\n");  // For debugging
             generate_expression(node->right);  // Generate code for the expression
-            fprintf(mixFile, "STA %d\n", find_memory_location(node->left->value));  // Store result into the variable using memory address
+            fprintf(mixFile, " STA %d\n", find_memory_location(node->left->value));  // Store result into the variable using memory address
             break;
         case NODE_IF:
             if (DEBUG) printf("NODE_IF\n");  // For debugging
