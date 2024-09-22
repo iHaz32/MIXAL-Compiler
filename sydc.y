@@ -171,8 +171,6 @@ void expand_node(TreeNode *node) {
         }
         case NODE_ASSIGNMENT: {  // handle assignment node
             symbol *symbol = find_symbol(node->left->value, symbolList);
-            printf("HEREEE\n");
-            printf("value: %s\n", node->left->value);
             if (symbol == NULL) {
                 symbol = create_symbol(node->left->value);  // create new symbol if not found
                 add_symbol(symbol, &symbolList);  // add it to the symbol list
