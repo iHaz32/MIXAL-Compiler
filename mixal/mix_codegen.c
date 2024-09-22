@@ -179,7 +179,9 @@ void generate_mix_code(TreeNode *node) {
     switch (node->type) {
         case NODE_PROGRAM:
             createMixFile();
+            fprintf(mixFile, "ORIG 2000\n");  // First mixal command
             generate_mix_code(node->left);  // Generate code for the program body
+            fprintf(mixFile, "END 2000\n");   // Last mixal command
             fclose(mixFile);
             break;
         case NODE_ASSIGNMENT:
