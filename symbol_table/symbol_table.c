@@ -1,7 +1,7 @@
 #include "symbol_table.h"
 
 // global variable to track the next available memory location
-int nextMemoryLocation = 2000; // initialize to a starting address
+int nextMemoryLocation = 2500; // initialize to a starting address
 
 void add_symbol(symbol *sym, symbol **symbolList) {
     sym->next = *symbolList;  // link new symbol to current head
