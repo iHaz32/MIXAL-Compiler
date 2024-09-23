@@ -1,0 +1,105 @@
+LEX/BISON LOGS
+--------------
+Lex: Returning READ
+Lex: Returning ID x
+Bison: Created read_stmt
+Bison: Created stmt_seq with stmt
+Lex: Returning SEMICOLON
+Lex: Returning IF
+Lex: Returning DEC_CONST 0
+Bison: Created factor with DEC_CONST
+Lex: Returning LT
+Lex: Returning ID x
+Bison: Created factor with ID
+Lex: Returning THEN
+Bison: Created rel_exp with '<'
+Bison: Parsed exp
+Lex: Returning ID fact
+Lex: Returning AS
+Lex: Returning DEC_CONST 1
+Bison: Created factor with DEC_CONST
+Lex: Returning SEMICOLON
+Bison: Parsed exp
+Bison: Created assign_stmt
+Bison: Created stmt_seq with stmt
+Lex: Returning REPEAT
+Lex: Returning ID fact
+Lex: Returning AS
+Lex: Returning ID fact
+Bison: Created factor with ID
+Lex: Returning TIMES
+Lex: Returning ID x
+Bison: Created factor with ID
+Bison: Created term with '*'
+Lex: Returning SEMICOLON
+Bison: Parsed exp
+Bison: Created assign_stmt
+Bison: Created stmt_seq with stmt
+Lex: Returning ID x
+Lex: Returning AS
+Lex: Returning ID x
+Bison: Created factor with ID
+Lex: Returning MINUS
+Lex: Returning DEC_CONST 1
+Bison: Created factor with DEC_CONST
+Lex: Returning UNTIL
+Bison: Created simple_exp with '-'
+Bison: Parsed exp
+Bison: Created assign_stmt
+Bison: Created stmt_seq with ';'
+Lex: Returning ID x
+Bison: Created factor with ID
+Lex: Returning EQ
+Lex: Returning DEC_CONST 0
+Bison: Created factor with DEC_CONST
+Lex: Returning SEMICOLON
+Bison: Created rel_exp with '='
+Bison: Parsed exp
+Bison: Created repeat_stmt
+Bison: Created stmt_seq with ';'
+Lex: Returning WRITE
+Lex: Returning ID fact
+Bison: Created write_stmt
+Bison: Created stmt_seq with ';'
+Lex: Returning END
+Bison: Created if_stmt
+Bison: Created stmt_seq with ';'
+Bison: Parsed program
+
+SYNTAX TREE
+-----------
+PROGRAM
+  SEQ
+    READ (x)
+    IF
+      LT (<)
+        NUMBER (0)
+        ID (x)
+      SEQ
+        SEQ
+          AS (:=)
+            ID (fact)
+            NUMBER (1)
+          REPEAT
+            SEQ
+              AS (:=)
+                ID (fact)
+                MUL (*)
+                  ID (fact)
+                  ID (x)
+              AS (:=)
+                ID (x)
+                SUB (-)
+                  ID (x)
+                  NUMBER (1)
+            EQ (=)
+              ID (x)
+              NUMBER (0)
+        WRITE (fact)
+
+ASSIGNMENTS
+-----------
+
+SYMBOL LIST
+-----------
+x: 0 (Location: 2500)
