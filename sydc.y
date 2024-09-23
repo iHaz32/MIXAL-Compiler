@@ -206,6 +206,8 @@ void expand_node(TreeNode *node) {
             symbol *symbol = find_symbol(node->value, symbolList);  // find symbol by name
             if (symbol != NULL) {
                 printf("%d", symbol->value);  // print symbol value
+            } else {
+                printf("Semantic Error: variable %s not found", node->value);
             }
             break;
         }
