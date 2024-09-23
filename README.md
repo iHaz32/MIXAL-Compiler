@@ -1,7 +1,7 @@
-# MyParser Project
+# MIXAL-COMPILER Project
 
 ## Description
-The **MyParser Project** is a simple compiler that processes a custom language using Flex (for lexical analysis), Bison (for syntax analysis), and generates MIX assembly code. This project includes a symbol table, syntax tree generation, and code generation in MIXAL (MIX Assembly Language). The output from this project includes a syntax tree, a symbol table, and corresponding MIXAL code for further execution in an emulator.
+The **MIXAL-COMPILER Project** is a simple compiler that processes a custom language using Flex (for lexical analysis), Bison (for syntax analysis), and generates MIX assembly code. This project includes a symbol table, syntax tree generation, and code generation in MIXAL (MIX Assembly Language). The output from this project includes a syntax tree, a symbol table, and corresponding MIXAL code for further execution in an emulator.
 
 ### Key Components:
 - **Lexical Analysis**: Handled by Flex (`lexc.l`).
