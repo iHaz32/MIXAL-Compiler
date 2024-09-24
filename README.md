@@ -18,11 +18,11 @@ To install and run this project locally, you need the following dependencies:
 ### Steps to Install:
 1. Clone the repository:
     ```bash
-    git clone https://github.com/yourusername/MyParser.git
+    git clone https://github.com/yourusername/MyParser.git](https://github.com/iHaz32/MIXAL-Compiler
     ```
 2. Navigate to the project directory:
     ```bash
-    cd MyParser
+    cd MIXAL-Compiler
     ```
 
 3. Ensure you have the required tools (GCC, Flex and Bison) installed.
